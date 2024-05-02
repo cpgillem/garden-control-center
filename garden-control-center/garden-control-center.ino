@@ -1,13 +1,12 @@
 // Based on https://arduinogetstarted.com/tutorials/arduino-uno-r4-wifi-controls-relay-via-web
-
 #include <WiFiS3.h>
+#include "./secrets.h"
 
 // TODO: pin definition map
 #define REGION_1_PIN 2
 
-// TODO: secrets file
-const char ssid[] = "";
-const char pass[] = "";
+const char ssid[] = SECRET_SSID;
+const char pass[] = SECRET_PASS;
 
 int status = WL_IDLE_STATUS;
 
