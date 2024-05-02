@@ -47,7 +47,6 @@ void loop() {
   if (client) {
     String HTTP_req = "";
     while (client.connected()) {
-      Serial.println("client connected");
       if (client.available()) {
         Serial.println("New HTTP Request");
         HTTP_req = client.readStringUntil('\n');  // read the first line of HTTP request
@@ -74,26 +73,43 @@ void loop() {
     // Expected values: 
     // - POST region/1 to turn on
     // - DELETE region/1 to turn off
-    if (HTTP_req.indexOf("region/1") > -1) {
-      if (HTTP_req.indexOf("POST") == 0) {
-        digitalWrite(REGION_1_PIN, HIGH);
-      } else if (HTTP_req.indexOf("DELETE") == 0) {
-        digitalWrite(REGION_1_PIN, LOW);
-      }
+    if (HTTP_req.indexOf("region") > -1) {
+      writeRegion(&HTTP_req);
     }
 
     // Send HTTP Response
-    // TODO: Split into functions
-    client.println("HTTP/1.1 200 OK");
-    client.println("Content-Type: text/html");
-    client.println("Connection: close");  // the connection will be closed after completion of the response
-    client.println();
-    client.println("");                     // the separator between HTTP header and body
-    client.flush();
+    sendResponse(&client);
+  }
+}
+
+// Routes a region request and turns it on or off.
+void writeRegion(String *req) {
+  // Decide whether region will be on or off. Other types of request do not affect it. Saving those for future features.
+  PinStatus output = LOW;
+  if (req->indexOf("POST") > -1) {
+    output = HIGH;
+  } else if (req->indexOf("DELETE") == -1) {
+    // Don't do anything if the request is not a DELETE either.
+    return;
+  }
+
+  // Check the first region.
+  if (req->indexOf("region/1") > -1) {
+    digitalWrite(REGION_1_PIN, output);
+  }
+}
+
+// Send a 200 response and close the connection.
+void sendResponse(WiFiClient *client) {
+    client->println("HTTP/1.1 200 OK");
+    client->println("Content-Type: text/html");
+    client->println("Connection: close");  // the connection will be closed after completion of the response
+    client->println();
+    client->println("");                     // the separator between HTTP header and body
+    client->flush();
 
     delay(10);
-    client.stop();
-  }
+    client->stop();
 }
 
 void printWifiStatus() {
