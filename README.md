@@ -18,5 +18,6 @@ Not needed in the first iteration. Cron jobs can be used to control watering wit
 
 ### To Be Implemented
 
+* More intelligent control over the Arduino than with curl/cron.
 * Recording data from the Arduino.
 * Serving a webpage for adjustments and monitoring.
